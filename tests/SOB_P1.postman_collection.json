@@ -1,0 +1,1433 @@
+{
+  "info": {
+    "name": "SOB P1 - API REST",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base",
+      "value": "http://localhost:8080/Homework1/rest/api/v1"
+    },
+    {
+      "key": "newPromptId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Prompts - lectura",
+      "item": [
+        {
+          "name": "GET prompts (ordenados por titulo)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "var l=pm.response.json(); var t=l.map(function(p){return p.title;}); pm.test(\"ordenado por titulo\", function(){ pm.expect(t).to.eql(t.slice().sort()); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompts author=alice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt?author=alice",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": [
+                {
+                  "key": "author",
+                  "value": "alice"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"solo alice\", function(){ pm.response.json().forEach(function(p){ pm.expect(p.author).to.eql(\"alice\"); }); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompts tag=resumen",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt?tag=resumen",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "resumen"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompt publico",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/1",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "1"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompt inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/9999",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "9999"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompt privado sin login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/3",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "3"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompt privado con login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/3",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "3"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tools de prompt 1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/1/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "1",
+                "tools"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tools de prompt sin tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/4/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "4",
+                "tools"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Prompts - escritura",
+      "item": [
+        {
+          "name": "POST sin login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"x\", \"template\": \"t\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST password erronea",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "mal"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"x\", \"template\": \"t\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST titulo vacio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"\", \"template\": \"t\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST sin template",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"x\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST autor inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"x\", \"template\": \"t\", \"author\": \"nadie\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"x\", \"template\": \"t\", \"author\": \"sob\", \"tools\": [9999]}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST correcto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\": \"Nuevo\", \"description\": \"d\", \"template\": \"Hola\", \"author\": \"sob\", \"isPrivate\": false, \"tags\": [\"test\"], \"tools\": [1, 2]}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "var j = pm.response.json(); pm.collectionVariables.set(\"newPromptId\", j.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET prompt creado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/prompt/{{newPromptId}}",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "{{newPromptId}}"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT tools sin login",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt/{{newPromptId}}/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "{{newPromptId}}",
+                "tools"
+              ],
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[1]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT tools prompt inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt/9999/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "9999",
+                "tools"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[1]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT tools tool inexistente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt/{{newPromptId}}/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "{{newPromptId}}",
+                "tools"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[9999]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "PUT tools correcto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/prompt/{{newPromptId}}/tools",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "prompt",
+                "{{newPromptId}}",
+                "tools"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[3]"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 204\", function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tools",
+      "item": [
+        {
+          "name": "GET tools",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tools author=alice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool?author=alice",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": [
+                {
+                  "key": "author",
+                  "value": "alice"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tools language=python",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool?language=python",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": [
+                {
+                  "key": "language",
+                  "value": "python"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tool publica",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool/1",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool",
+                "1"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tool inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool/9999",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool",
+                "9999"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tool privada sin login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool/3",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool",
+                "3"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET tool privada con login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/tool/3",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool",
+                "3"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool sin login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"x\", \"code\": \"print(1)\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool nombre vacio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"\", \"code\": \"print(1)\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool sin codigo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"x\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool autor inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"x\", \"code\": \"print(1)\", \"author\": \"nadie\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST tool correcta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base}}/tool",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "tool"
+              ],
+              "query": []
+            },
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "username",
+                  "value": "sob"
+                },
+                {
+                  "key": "password",
+                  "value": "sob"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\"name\": \"hello\", \"code\": \"print(1)\", \"version\": \"1.0\", \"author\": \"sob\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Customers",
+      "item": [
+        {
+          "name": "GET customers (sin password)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/customer",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "customer"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"sin password\", function(){ pm.expect(pm.response.text()).to.not.include(\"password\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET customer 1 (HATEOAS, sin password)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/customer/1",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "customer",
+                "1"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"sin password\", function(){ pm.expect(pm.response.text()).to.not.include(\"password\"); }); pm.test(\"tiene _links\", function(){ pm.expect(pm.response.json()).to.have.property(\"_links\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GET customer inexistente",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base}}/customer/9999",
+              "host": [
+                "{{base}}"
+              ],
+              "path": [
+                "customer",
+                "9999"
+              ],
+              "query": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
