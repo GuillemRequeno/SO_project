@@ -8,7 +8,7 @@
     <property name="URL" value="jdbc:derby://localhost:1527/homework1"/>
     <property name="serverName" value="localhost"/>
     <property name="PortNumber" value="1527"/>
-    <property name="DatabaseName" value="homework1"/>
+    <property name="DatabaseName" value="sob_grup_63"/>
     <property name="User" value="root"/>
     <property name="Password" value="root"/>
   </jdbc-connection-pool>

@@ -1,5 +1,6 @@
 package authn;
 
+import model.entities.Customer;
 import com.sun.xml.messaging.saaj.util.Base64;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -66,9 +67,8 @@ public class RESTRequestFilter implements ContainerRequestFilter {
                     }
                     
                     try {
-                        TypedQuery<Credentials> query = em.createNamedQuery("Credentials.findUser", Credentials.class);
-                        Credentials c = query.setParameter("username", username)
-                            .getSingleResult();
+                        TypedQuery<Customer> query = em.createNamedQuery("Customer.findUser", Customer.class);
+                        Customer c = query.setParameter("username", username).getSingleResult();
                         if(!c.getPassword().equals(password)) {
                             requestCtx.abortWith(
                                 Response.status(Response.Status.FORBIDDEN).build()
