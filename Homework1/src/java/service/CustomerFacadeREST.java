@@ -9,6 +9,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,19 @@ public class CustomerFacadeREST extends AbstractFacade<Customer> {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Customer> list() {
-        return em.createQuery("SELECT c FROM Customer c ORDER BY c.username",
+    public List<Map<String, Object>> list() {
+        List<Customer> customers = em.createQuery("SELECT c FROM Customer c ORDER BY c.username",
                 Customer.class).getResultList();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Customer c : customers) {
+            // Nunca se expone la password
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("id", c.getId());
+            m.put("username", c.getUsername());
+            m.put("name", c.getName());
+            result.add(m);
+        }
+        return result;
     }
 
     @GET

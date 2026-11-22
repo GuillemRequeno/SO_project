@@ -13,6 +13,7 @@ import java.util.*;
 public class Prompt implements Serializable {
 
     @Id
+    @SequenceGenerator(name = "Prompt_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Prompt_Gen")
     private Long id;
 
@@ -108,5 +109,24 @@ public class Prompt implements Serializable {
     public void setTools(Set<Tool> tools) {
         this.tools = tools;
     }
-    
+
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Prompt)) {
+            return false;
+        }
+        Prompt other = (Prompt) object;
+        if (this.id == null || other.id == null) {
+            return this == other;
+        }
+        return this.id.equals(other.id);
+    }
 }

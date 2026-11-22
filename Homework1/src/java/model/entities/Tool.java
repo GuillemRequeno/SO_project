@@ -13,6 +13,7 @@ import java.util.Date;
 public class Tool implements Serializable {
 
     @Id
+    @SequenceGenerator(name = "Tool_Gen", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "Tool_Gen")
     private Long id;
 
@@ -104,5 +105,24 @@ public class Tool implements Serializable {
     public void setAuthor(Customer author) {
         this.author = author;
     }
-    
+
+    @Override
+    public int hashCode() {
+        if (id != null) {
+            return id.hashCode();
+        }
+        return 0;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof Tool)) {
+            return false;
+        }
+        Tool other = (Tool) object;
+        if (this.id == null || other.id == null) {
+            return this == other;
+        }
+        return this.id.equals(other.id);
+    }
 }

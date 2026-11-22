@@ -1,5 +1,6 @@
 package service;
 
+import authn.AuthHelper;
 import authn.Secured;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -7,7 +8,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import model.entities.Customer;
 import model.entities.Prompt;
@@ -48,7 +48,7 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
     public List<Map<String, Object>> listPrompts(@QueryParam("author") String author,
                                                  @QueryParam("tag") String tag) {
         // Consulta dinámica: el filtrado se hace en la base de datos
-        StringBuilder jpql = new StringBuilder("SELECT DISTINCT p FROM Prompt p WHERE 1 = 1");
+        StringBuilder jpql = new StringBuilder("SELECT p FROM Prompt p WHERE 1 = 1");
         if (author != null && !author.isEmpty()) {
             jpql.append(" AND p.author.username = :author");
         }
@@ -84,7 +84,7 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         // No lleva @Secured: solo los privados exigen autenticación
-        if (p.isIsPrivate() && !isAuthenticated(headers)) {
+        if (p.isIsPrivate() && !AuthHelper.isAuthenticated(em, headers)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         return Response.ok(toFull(p)).build();
@@ -110,7 +110,7 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
         if (in.author == null || in.author.trim().isEmpty()) {
             return badRequest("Falta el autor");
         }
-        Customer author = findCustomer(in.author);
+        Customer author = AuthHelper.findCustomer(em, in.author);
         if (author == null) {
             return badRequest("El autor no existe: " + in.author);
         }
@@ -157,7 +157,7 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
         if (p == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        if (p.isIsPrivate() && !isAuthenticated(headers)) {
+        if (p.isIsPrivate() && !AuthHelper.isAuthenticated(em, headers)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
         if (p.getTools().isEmpty()) {
@@ -165,7 +165,7 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
         }
         List<Map<String, Object>> result = new ArrayList<>();
         for (Tool t : p.getTools()) {
-            result.add(toolMap(t));
+            result.add(JsonViews.tool(t));
         }
         return Response.ok(result).build();
     }
@@ -206,33 +206,6 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
         return Response.status(Response.Status.BAD_REQUEST).entity(body).build();
     }
 
-    private Customer findCustomer(String username) {
-        List<Customer> list = em.createNamedQuery("Customer.findUser", Customer.class)
-                .setParameter("username", username)
-                .getResultList();
-        return list.isEmpty() ? null : list.get(0);
-    }
-
-    /** Comprueba a mano la cabecera Authorization (Basic). */
-    private boolean isAuthenticated(HttpHeaders headers) {
-        String auth = headers.getHeaderString(HttpHeaders.AUTHORIZATION);
-        if (auth == null || !auth.startsWith("Basic ")) {
-            return false;
-        }
-        try {
-            String decoded = new String(Base64.getDecoder().decode(auth.substring(6).trim()),
-                    StandardCharsets.UTF_8);
-            int i = decoded.indexOf(':');
-            if (i < 0) {
-                return false;
-            }
-            Customer c = findCustomer(decoded.substring(0, i));
-            return c != null && c.getPassword().equals(decoded.substring(i + 1));
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     /** Resumen para prompts privados. */
     private Map<String, Object> toSummary(Prompt p) {
         Map<String, Object> m = new LinkedHashMap<>();
@@ -249,26 +222,12 @@ public class PromptFacadeREST extends AbstractFacade<Prompt> {
         m.put("description", p.getDescription());
         m.put("template", p.getTemplate());
         m.put("tags", new ArrayList<>(p.getTags()));
-        m.put("private", p.isIsPrivate());
+        m.put("isPrivate", p.isIsPrivate());
         List<Long> toolIds = new ArrayList<>();
         for (Tool t : p.getTools()) {
             toolIds.add(t.getId());
         }
         m.put("tools", toolIds);
-        return m;
-    }
-
-    private Map<String, Object> toolMap(Tool t) {
-        Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id", t.getId());
-        m.put("name", t.getName());
-        m.put("language", t.getLanguage());
-        m.put("author", t.getAuthor().getUsername());
-        if (!t.isIsPrivate()) {
-            m.put("description", t.getDescription());
-            m.put("version", t.getVersion());
-            m.put("code", t.getCode());
-        }
         return m;
     }
 }
