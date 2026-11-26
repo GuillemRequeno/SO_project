@@ -4,10 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import model.entities.Tool;
 
-/**
- * Representaciones JSON (resumen / completa) de los recursos. Se devuelven
- * como Map para controlar exactamente que campos salen (nunca la password).
- */
+
 public final class JsonViews {
 
     private JsonViews() {
